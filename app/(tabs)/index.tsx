@@ -1,52 +1,87 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, Platform, View, Text, SafeAreaView, TextInput, Button, FlatList } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
+
+
+  const [shopdata, setShopdata] = useState ([
+    {
+      id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+      title: 'First Item',
+    },
+    {
+      id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+      title: 'Second Item',
+    },
+    {
+      id: '58694a0f-3da1-471f-bd96-145571e29d72',
+      title: 'Third Item',
+    },
+  ]);
+
+
+
+  const [addtext, setAddtext] = useState("");
+  const [shoptext, setShoptext] = useState("");
+
+
+  useEffect(() => {
+    loadShopping();
+  }, []);
+
+
+  async function saveShopping() {
+    setShoptext(addtext);
+
+    const newshop = [...shopdata, { id: "a", title: addtext}];
+
+await AsyncStorage.setItem ("shoplist")
+
+    setShopdata (newshop);
+
+
+    await AsyncStorage.setItem("mytext", addtext);
+  }
+
+  async function loadShopping() {
+    const loadedtext = await AsyncStorage.getItem("mytext");
+
+    if (loadedtext != null) {
+      setShoptext(loadedtext);
+    }
+
+  }
+
+
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+
+    <SafeAreaView>
+
+      <View>
+        <Text> {shoptext} </Text>
+
+        <TextInput onChangeText={setAddtext} value={addtext} />
+
+        <Button title='Save' onPress={saveShopping} />
+
+
+        <FlatList
+          data={shopdata}
+          renderItem={({ item }) => <Text>{ item.title }</Text>}
+          />
+
+      </View>
+
+    </SafeAreaView>
+
+
   );
 }
 
